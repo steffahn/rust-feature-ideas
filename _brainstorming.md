@@ -63,3 +63,10 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		shadowing earlier bindings will allow drops of `DropEarly` values (if no reference, etc. is retained either).
 		
 	*	The exact (or perhaps earliest possible) point of drop is the end of the smalles possible lifetime of the variable.
+	*	There should be `impl`s such as for example:
+		```rust
+		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
+		impl<T: ?Sized + DropEarly> DropEarly for Vec<T> {}
+		```
+		And every type that doesn’t (directly or inderectly) need any custom `drop` call should behave
+		as if it’s `DropEarly` anyways.
