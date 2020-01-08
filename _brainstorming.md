@@ -3,6 +3,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	*	(Ideally / at least conceptually) supertrait of `Copy`,
 		ideally an auto trait although that would make it quite the
 		breaking change, if it’s not auto but supertrait of `Copy` that would be breaking too.
+		(Update: perhaps scrub the relationship to `Copy`, it’s more about Drops).
 	*	Makes the compiler drop a value of this type not at the end of it’s static scope but as
 		early as possible. (Or perhaps just allows dropping at any point from earliest possible
 		to end of scope?)
@@ -61,12 +62,15 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		Solves problems with memory leaks in a naive REPL (i.e. REPL interface with the approach:
 		what you write constitures the body of a very long `main()` function. There rerunning commands
 		shadowing earlier bindings will allow drops of `DropEarly` values (if no reference, etc. is retained either).
-		
 	*	The exact (or perhaps earliest possible) point of drop is the end of the smalles possible lifetime of the variable.
 	*	There should be `impl`s such as for example:
+
 		```rust
 		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
 		impl<T: ?Sized + DropEarly> DropEarly for Vec<T> {}
 		```
-		And every type that doesn’t (directly or inderectly) need any custom `drop` call should behave
-		as if it’s `DropEarly` anyways.
+		And at least every type that doesn’t (directly or inderectly) need any custom drop should automatically
+		implement `DropEarly`. This might introduce a breaking change in library updates if they change their type.
+		This is bad if we don’t allow disabling the feature for such types.
+		Maybe a good approach to prevent something like that is something like only allow use of `DropEarly`
+		constraints in `DropEarly` impls.
