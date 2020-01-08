@@ -69,8 +69,15 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
 		impl<T: ?Sized + DropEarly> DropEarly for Vec<T> {}
 		```
+		Note, that this already has effect on types like `Vec<u8>`, etc
+		
 		And at least every type that doesn’t (directly or inderectly) need any custom drop should automatically
 		implement `DropEarly`. This might introduce a breaking change in library updates if they change their type.
 		This is bad if we don’t allow disabling the feature for such types.
 		Maybe a good approach to prevent something like that is something like only allow use of `DropEarly`
 		constraints in `DropEarly` impls.
+		
+		As stated in the beginning, implementation as an auto trait can break current stuff. However, maybe structs that
+		contain only `DropEarly` types and that themselves don’t implement `Drop` (so they don’t do anything on drop that’s
+		not not already explicitly marked _okay for executing earlier than lexical end of scope_ by their component
+		anyways) can get auto `impl`’d.
