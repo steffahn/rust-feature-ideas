@@ -53,7 +53,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 			}
 		}
 		```
-		
+
 		About avoiding moves:
 		TODO: find that example where `Drop` enforces a copy in one of the books again.
 		
@@ -64,7 +64,6 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		shadowing earlier bindings will allow drops of `DropEarly` values (if no reference, etc. is retained either).
 	*	The exact (or perhaps earliest possible) point of drop is the end of the smalles possible lifetime of the variable.
 	*	There should be `impl`s such as for example:
-
 		```rust
 		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
 		impl<T: ?Sized + DropEarly> DropEarly for Vec<T> {}
@@ -81,3 +80,15 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		contain only `DropEarly` types and that themselves don’t implement `Drop` (so they don’t do anything on drop that’s
 		not not already explicitly marked _okay for executing earlier than lexical end of scope_ by their component
 		anyways) can get auto `impl`’d.
+
+*	Some type system feature that allows back-wards reasoning to refine a type with certain defaults into slower but more
+	capable variants. The example in mind would be a data structure using `Rc`, but that upgrades to `Arc` to become `Sync`
+	(or maybe also to become `Send`). Questions arise on how far this decision gets fixed, i.e. in an Application where some
+	variables (in some places) need `Sync` and others don’t, on what granularity will types be fixed to the `Arc` version around those
+	variables?
+	
+	Reasoning: It’s inconvenient to implement and even more inconvenient to use rc-based data
+	
+	Problems: Lots. For example even: Concrete `Rc` and `Ac` has special properties like method dispatching - how does that generalize?
+	Also, while we’re at it, we should provide ways to unify `&` and `&mut`, and perhaps there, too, allow chains of type-inference to
+	pick the right one.
