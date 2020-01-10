@@ -92,3 +92,12 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	Problems: Lots. For example even: Concrete `Rc` and `Ac` has special properties like method dispatching - how does that generalize?
 	Also, while we’re at it, we should provide ways to unify `&` and `&mut`, and perhaps there, too, allow chains of type-inference to
 	pick the right one.
+
+*	Shouldn't references to zero-sized types be zero-sized and references to empty types be empty?
+
+	Shouldn't immutable references to (non-UnsafeCell-containing) small (i.e. sub pointer-size) types be actually passed
+	by value? Although this is dangerous if it can kill optimizations such as `Option<&usize>` being small enough. But
+	at least for types strictly smaller than `usize`, we can pass value instead, saving dereferencing operations.
+	
+	Although... this actually introduces dereferencing to `&mut` to `&` conversions.... aaaand makes `&` to `*const`
+	conversions kind-of _wrong_
