@@ -101,3 +101,5 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	
 	Although... this actually introduces dereferencing to `&mut` to `&` conversions.... aaaand makes `&` to `*const`
 	conversions kind-of _wrong_
+*	This type:
+	([Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=91f673f3ced8398d01f44372d56c41cf))
