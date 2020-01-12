@@ -146,3 +146,9 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 *	Anonymous `trait`-associated-types by allowing `impl` return values. Allow referencing a functions return type via
 	`...::return`, i.e. `path::to::function::<'a,'b,A,B,C>::return` or `function::return`. Consequently allow
 	`Trait<method::return = A>`.
+
+*	`sealed trait` for traits that only allow `impls` inside the current crate. Also `sealed impl` for impls with `default fn`s inside
+	where you don’t want any non-crate-local specializations. Finally `sealed partial impl` might behave similarly; in this case
+	`sealed trait` is just syntax for an empty `sealed partial impl`. This also allows for negative implementations
+	like for example `sealed partial impl<'a> DerefMut for &'a {}` prevents anyone from implementing `DerefMut` on immutable
+	references (see: problems with unsoundness of `Pin`).
