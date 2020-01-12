@@ -138,7 +138,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		compile-type to mess with the compiler - not so sure what to do about it... I don’t _really_ feel okay with UB at
 		compile-time... Maybe marking functions as `internally unsafe` and disallowing them, where the standard library
 		and some “officially” approved code as well as all the crates that you mark explicitly as trustworthy for during-compilation
-		unsafety in your crate/project configuration can then _be_ allowed again. However - using “untrusted” is something you
+		unsafety in your crate/project configuration can then _be_ allowed again. However - using “untrusted” code/libs is something you
 		shouldn’t to at all in general, so maybe this is not so smart after all?
 
 	*	A possible extension of the `mut` syntax could include additional 
