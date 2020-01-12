@@ -111,7 +111,11 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	implicit mutability constraints just like for lifetimes, syntax being for example `fn f(some_struct: &mut? Struct) -> &mut? Field`
 	(meaning the same as previous explicit example), with similar or identical rules as for lifetimes. There would be a subtyping
 	relation `'Ref : 'Mut` _[TODO: is currently `&` vs `&mut` subtyping or is it implicit conversion? How bad might a change be?]_
-	and covariance of refs in their mutability. Accordingly, `'M + 'N` is `'Mut` if and only if `'M` and `'N` are _both_ `'Mut`.
+	and covariance of refs in their mutability. Accordingly, `'M + 'N` is `'Mut` if and only if `'M` and `'N` are _both_ `'Mut`. Also
+	`for<...>` notation should be included.
+	
+	You can then remove lots of duplication. For example `FnMut` vs `Fn`. `BorrowMut` vs. `Borrow`. (Note, for unsafe code, for
+	example in `RefCell` it should be useful to get the value of a mutability parameter at run-time.)
 	
 	Back to the first point: We can then have _[TODO: how does actually this compare to current `const` RFCs?]_ a function like
 	`fn mutate_field(&mut struct: Struct)` and another function `mut fn mutate_global_state()`. I think this compares very well.
@@ -134,6 +138,8 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	all the crates that you mark explicitly as trustworthy for during-compilation unsafety in your crate/project configuration
 	can then _be_ allowed again. However - using “untrusted” is something you shouldn’t to at all in general, so maybe this is not
 	so smart after all?
+	
+	A possible extension of the `mut` syntax could include additional 
 
 *	Anonymous `trait`-associated-types by allowing `impl` return values. Allow referencing a functions return type via
 	`...::return`, i.e. `path::to::function::<'a,'b,A,B,C>::return` or `function::return`. Consequently allow
