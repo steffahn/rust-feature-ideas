@@ -103,3 +103,38 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	conversions kind-of _wrong_
 *	This type:
 	([Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=91f673f3ced8398d01f44372d56c41cf))
+*	_[TODO: did I already mention sth. like this above?]_ Marking non-`const` functions `mut` instead. I.e. `mut fn f(a: A) -> B`.
+
+	Treat `mut` in references like lifetimes in some regards: Allow generic functions over those, as in some syntax like
+	for example: `fn f<'M>(some_struct: &mut?'M Struct) -> &mut?'M Field`. We’d have reserved mutability names `'Mut` and `'Ref`
+	and the explicit `&'a mut` would mean `&'a mut?'Mut`, and `&'a` would mean `&'a mut?'Ref`. There would be the option to have
+	implicit mutability constraints just like for lifetimes, syntax being for example `fn f(some_struct: &mut? Struct) -> &mut? Field`
+	(meaning the same as previous explicit example), with similar or identical rules as for lifetimes. There would be a subtyping
+	relation `'Ref : 'Mut` _[TODO: is currently `&` vs `&mut` subtyping or is it implicit conversion? How bad might a change be?]_
+	and covariance of refs in their mutability. Accordingly, `'M + 'N` is `'Mut` if and only if `'M` and `'N` are _both_ `'Mut`.
+	
+	Back to the first point: We can then have _[TODO: how does actually this compare to current `const` RFCs?]_ a function like
+	`fn mutate_field(&mut struct: Struct)` and another function `mut fn mutate_global_state()`. I think this compares very well.
+	A problem is something like `RefCell`. It might, at a first approximation, mutate global state to write into the inner mutability.
+	But it also has read-only access start rely on global state, i.e. both `borrow` and `borrow_mut` being `mut fn`s.
+	
+	I'd like to introduce a distiction between references with interior mutability and ones without. Maybe `&const` for pure references.
+	So have `'Const : 'Ref` and `'Const : 'Mut`. The idea being, that `RefCell`’s `borrow` can still be `fn borrow(&self) -> Ref<T>`.
+	But for example normal field access, like `fn f(some_struct: &mut? Struct) -> &mut? Field`, would allow for usage via
+	`(some_struct: &const Struct) -> &const Field`.
+	
+	Perhaps, if I can think of a good way, there might be a possibility to infer all the `mut` vs. non-`mut fn`’s information as well as
+	`'Ref` vs `'Const` automatically. (I.e. make `&` mean both `&const` and “`&ref`” at the depending on inference.) This could make
+	`mut` annotations for functions optional, but generate a warning if missing to make it non-breaking somehow. This sounds like some
+	kind of global type-inference but not a full-blown one, so it might just be thinkable.
+	
+	Lastly, unsafe code is allowed to break these properties. This may allow properly `const`-typed functions executed at compile-type
+	to mess with the compiler - not so sure what to do about it... I don’t _really_ feel okay with UB at compile-time... Maybe marking
+	functions as `internally unsafe` and disallowing them, where the standard library and some “officially” approved code as well as
+	all the crates that you mark explicitly as trustworthy for during-compilation unsafety in your crate/project configuration
+	can then _be_ allowed again. However - using “untrusted” is something you shouldn’t to at all in general, so maybe this is not
+	so smart after all?
+
+*	Anonymous `trait`-associated-types by allowing `impl` return values. Allow referencing a functions return type via
+	`...::return`, i.e. `path::to::function::<'a,'b,A,B,C>::return` or `function::return`. Consequently allow
+	`Trait<method::return = A>`.
