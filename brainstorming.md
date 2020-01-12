@@ -131,7 +131,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 
 	*	Perhaps, if I can think of a good way, there might be a possibility to infer all the `mut` vs. non-`mut fn`’s information
 		as well as `'Ref` vs `'Const` automatically. (I.e. make `&` mean both `&const` and “`&ref`” at the depending on inference.)
-		This could make `mut` annotations for functions optional, but generate a warning if missing to make it non-breaking somehow.
+		This could make `mut` annotations for functions optional, but generate a warning if missing, to make it non-breaking somehow.
 		This sounds like some kind of global type-inference but not a full-blown one, so it might just be thinkable.
 
 	*	Lastly, unsafe code is allowed to break these properties. This may allow properly `const`-typed functions executed at
