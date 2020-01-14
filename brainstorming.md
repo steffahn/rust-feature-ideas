@@ -102,7 +102,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	Although... this actually introduces dereferencing to `&mut` to `&` conversions.... aaaand makes `&` to `*const`
 	conversions kind-of _wrong_
 *	This type:
-	([Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=91f673f3ced8398d01f44372d56c41cf))
+	([Playground](https://play.rust-lang.org/?version=nightly&mode=debug&edition=2018&gist=b56bf6de50f4a69d33914d4dbac1af34))
 *	Mutability generics, and allowing pure functions (by improving `const`).
 	*	_[TODO: did I already mention sth. like this above?]_ Marking non-`const` functions `mut` instead. I.e. `mut fn f(a: A) -> B`.
 
