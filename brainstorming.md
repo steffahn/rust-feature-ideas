@@ -154,3 +154,10 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	references (see: problems with unsoundness of `Pin`).
 
 *	Allow update syntax for non-`Drop` implementing structs even if some fields are private.
+
+*	Somehow provide default that partially initializes a struct and calls for specifying the rest manually, furthermore
+	allows overwriting already-initialized public fields and, as a bonus, would even allow, somehow, and maybe not
+	for all fields, that a provided-and-defaulted public field skips the creation of the default value alltogether.
+	
+	On the last point, maybe somehow flag types that can be constructed and destructed again without _actual_ side
+	effect except for, perhaps, some allocations (which is _the point_ of the whole idea) that can be skipped.
