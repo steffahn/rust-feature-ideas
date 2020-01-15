@@ -152,3 +152,5 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	`sealed trait` is just syntax for an empty `sealed partial impl`. This also allows for negative implementations
 	like for example `sealed partial impl<'a> DerefMut for &'a {}` prevents anyone from implementing `DerefMut` on immutable
 	references (see: problems with unsoundness of `Pin`).
+
+*	Allow update syntax for non-`Drop` implementing structs even if some fields are private.
