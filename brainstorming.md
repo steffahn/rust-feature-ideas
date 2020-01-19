@@ -153,7 +153,8 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	like for example `sealed partial impl<'a> DerefMut for &'a {}` prevents anyone from implementing `DerefMut` on immutable
 	references (see: problems with unsoundness of `Pin`).
 
-*	Allow update syntax for non-`Drop` implementing structs even if some fields are private.
+*	Allow update syntax for non-`Drop` implementing structs even if some fields are private. _(TODO: how could this **actually** be
+	desugared?)_
 
 *	Somehow provide default that partially initializes a struct and calls for specifying the rest manually, furthermore
 	allows overwriting already-initialized public fields and, as a bonus, would even allow, somehow, and maybe not
@@ -161,3 +162,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	
 	On the last point, maybe somehow flag types that can be constructed and destructed again without _actual_ side
 	effect except for, perhaps, some allocations (which is _the point_ of the whole idea) that can be skipped.
+
+*	Have types that disallow default/implicit drop, as perhaps an extension to the current `must_use` warning. Of course `leak`
+	would still work, but it’s a useful strong lint to thinks that you can only “properly” get rid of in a more complex manner,
+	especially if that manner needs some extra arguments.
