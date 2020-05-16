@@ -3,10 +3,22 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	*	(Ideally / at least conceptually) supertrait of `Copy`,
 		ideally an auto trait although that would make it quite the
 		breaking change, if it’s not auto but supertrait of `Copy` that would be breaking too.
+
 		(Update: perhaps scrub the relationship to `Copy`, it’s more about Drops).
+		
+		(Update on the auto trait idea: You could (should) by-default exclude pointers; those would probably be needed
+		for something that implements e.g. a scoped lock. Also Editions might somehow avoid breaking change.)
+
 	*	Makes the compiler drop a value of this type not at the end of it’s static scope but as
 		early as possible. (Or perhaps just allows dropping at any point from earliest possible
-		to end of scope?)
+		to end of scope?
+
+	*	Possible problems are: E.g. locks that rely on being held for the scope for logically correct behavior,
+		and extra latency introduced into code by clean-up happening before the very end. The second point might be not an actual
+		problem since Rust doesn’t seem to care about such latency questions very much anyways. When there’s something like a block
+		of code where latency is relevant, one could defer all cleanup possible, maybe only allow functions marked non-blocking, or even
+		worst-case constant time or something like that.
+
 	*	Hence some (or most) drop flags would become unnecessary; furthermore some moves can be eliminated,
 		(suppose, `String` implements `DropEarly`) for example:
 		```rust
@@ -62,7 +74,17 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		Solves problems with memory leaks in a naive REPL (i.e. REPL interface with the approach:
 		what you write constitures the body of a very long `main()` function. There rerunning commands
 		shadowing earlier bindings will allow drops of `DropEarly` values (if no reference, etc. is retained either).
+		
+		This should also dramatically help with supporting tail call optimization implicitly. (An explicit version is still desirable
+		of course, to prevent bugs.) Currently, with a tail call, any local variable not passed to the call that has `Drop` glue
+		could not be dropped before that call, resulting in the situation that additional stack space is still needed. With the
+		`DropEarly` feature, everything could be dropped unless its lifetime is restricted by some argument passed to the tail call or
+		it does not implement `DropEarly`.
+		
+		The explicit tail-call would have similar constraints, but without the `DropEarly` problem.
+
 	*	The exact (or perhaps earliest possible) point of drop is the end of the smalles possible lifetime of the variable.
+
 	*	There should be `impl`s such as for example:
 		```rust
 		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
@@ -101,8 +123,10 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 
 	Although... this actually introduces dereferencing to `&mut` to `&` conversions.... aaaand makes `&` to `*const`
 	conversions kind-of _wrong_
+
 *	This type:
 	([Playground](https://play.rust-lang.org/?version=nightly&mode=debug&edition=2018&gist=b56bf6de50f4a69d33914d4dbac1af34))
+
 *	Mutability generics, and allowing pure functions (by improving `const`).
 	*	_[TODO: did I already mention sth. like this above?]_ Marking non-`const` functions `mut` instead. I.e. `mut fn f(a: A) -> B`.
 
@@ -166,3 +190,25 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 *	Have types that disallow default/implicit drop, as perhaps an extension to the current `must_use` warning. Of course `leak`
 	would still work, but it’s a useful strong lint to thinks that you can only “properly” get rid of in a more complex manner,
 	especially if that manner needs some extra arguments.
+
+*	Borrowing parts of something: The basic problem is that you cannot model fields with methods currently. This also
+	means that proper “properties” syntax is not really possible in a way where they behave the same as fields do. One problem is
+	that fields can borrow only that part of the struct whereas methods called on the struct must keep the whole thing occupied.
+	There could be syntax for a reference to the whole struct but with access to certain fields only. Furthermore there is fan-out:
+	Certain parts could be borrowed for longer than others, go into different result types, or only be used inside the method itself.
+	
+	*	Would need to be able to borrow fields. Would be nice to have: multiple fields, named (abstract) groups of fields, support
+		array indices and ranges if indices (no need for split_mut). For this, some kind of `const` functionality for overlap-tests is
+		needed. For instance an associated (usually enum) type allowing indices, sets and ranged, with implementations for
+		overlap-checks could do the trick.
+	
+	*	Another thing that fields do is destructuring. This seems more complicated to abstract upon. You would perhaps need a way to
+		disjointly union areas, and get the complement, and finally pass the result as a const parameter to the destructor that also
+		only gets a reference on that area. And this is only for the static stuff... IIRC there are probably drop-check flags on
+		individual fields, too, and this kind of compatibility shall not be lost either. Finally, with indexing, indices are often
+		only available at run-time. (Damn it, `split_mut` probably stays...) It could be possible to do some overlap-ckecks at runtime,
+		however what to do if these fail? Panics are somewhat surprising; so possibly something with `Option`...
+
+*	Go towards linear-ish types with something that is not like `must_use` bound to functions but instead to types in a sense that they
+	must be either destructured or passed to `drop` in a place where all the fields are visible and not `must_use`. A light version
+	might also allow as an opt-in for a type to allow explicit `drop` in general.
