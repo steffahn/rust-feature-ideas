@@ -213,3 +213,25 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	must be either destructured or passed to `drop` in a place where all the fields are visible and not `must_use`. Perhaps even allow
 	implicit drops, and drops inside generics somehow if that’s possible. A light version might also allow as an opt-in for a type to
 	allow explicit `drop` in general.
+
+*	Improve usage of `Sized`. In particular in view of the possibility of future similar types that are bound by default for backwards
+	compatibility. The ideas for improvements include:
+	*	A warning if a bound `<T>` could be generalized to `<T: ?Sized>` but isn’t. (The warning would require either an explicit
+		`<T: Sized>` or committing to the generealization `<T: ?Sized>` to go away.
+	*	Regarding this, it is not quite clear how this is supposed to work around traits, since the generalization of an `impl`
+		technically adds new `impl`s in a potentially breaking way. Thinking about it, the _real_ breakage only occurs if a conflicting
+		`impl` already exists for some `!Sized` type.
+	*	Perhaps automatically infer `Sized` constraints on non-public things. The main reason against inference of such stuff is
+		two-fold: Explicit signatures may make development easier since less stuff is implicitly assumed. In the particular case of
+		`Sized` there are some times where the need for a `Sized` bound is already clear from the rest of the signature, while in other
+		cases an explicit `Sized` constraint would actually be the most readable thing. The second reason however is to avoid breaking
+		changes in interface. If type information is implicit, then types can change without the signature changing. In particular,
+		breaking changes from removal of capabilities that were never meant to exist are problematic. The problem of breakage however
+		really only occurs if the provider and the user of an API are different people -- and in particular if they don’t even know
+		each other -- non-public things will never be part of such an API, so inference might be okay there. On a side-note, Rust
+		actually (unfortunately) already has, in some cases, type information that is not explicit in a signuature. This is the case
+		for functions returning `impl Future` or `impl Fn…` with respect to some `auto trait`s like `Send`. A generic function
+		`fn f<T>(x: T) -> impl FnOnce()` may put the `T` inside the closure which is thus only `Send`, `Sync`, etc, if `T` is.
+
+*	Fix contraints in type definitions. Remove the same quirk that
+	[Haskell used to have](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#data-type-contexts).
