@@ -210,5 +210,6 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		however what to do if these fail? Panics are somewhat surprising; so possibly something with `Option`...
 
 *	Go towards linear-ish types with something that is not like `must_use` bound to functions but instead to types in a sense that they
-	must be either destructured or passed to `drop` in a place where all the fields are visible and not `must_use`. A light version
-	might also allow as an opt-in for a type to allow explicit `drop` in general.
+	must be either destructured or passed to `drop` in a place where all the fields are visible and not `must_use`. Perhaps even allow
+	implicit drops, and drops inside generics somehow if that’s possible. A light version might also allow as an opt-in for a type to
+	allow explicit `drop` in general.
