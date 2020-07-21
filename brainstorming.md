@@ -235,3 +235,63 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 
 *	Fix contraints in type definitions. Remove the same quirk that
 	[Haskell used to have](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#data-type-contexts).
+
+*	Type based macros
+	*	A collection of traits `Macro`, `MacroMut`, `MacroOnce`, and `PrimitiveMacroOnce`, where the hierarchy is:
+		Every `PrimitiveMacroOnce` is a `MacroOnce`, every `Macro` is a `MacroMut`, every `MacroMut` is a `MacroOnce`.
+	*	every _ordinary_ macro is a zero_sized type that implemets `Macro` and `PrimitiveMacroOnce` and `Copy`.
+	*	`Macro` has an associated type `MacroType: PrimitiveMacro`, and we have `trait PrimitiveMacroOnce: MacroOnce<MacroType = Self>`.
+	*	There is a way to create _macro closures_.
+		```rust
+		// TODO: make this fit with the changed PrimitiveMacroOnce
+		fn foo() -> impl PrimitiveMacro {
+			let x = 1;
+			let y = 2;
+			let my_macro = macro_closure!(move [ref x, ref y], {
+				(foobar +-+ $e:expr) => {println!("{}", x + y + $e};
+			});
+			my_macro
+		}
+		fn bar() {
+			let my_macro = foo();
+			my_macro!(foobar +-+ 3*3);
+		}
+		```
+		which could, roughly, be thought of like
+		```rust
+		macro_rules! foo_macro_closure_001 {
+			($x:ident $y:ident foobar +-+ $e:expr) => {println!("{}", (*$x) + (*$y) + $e};
+		}
+		fn foo() -> impl PrimitiveMacro {
+			let x = 1;
+			let y = 2;
+			struct foo_macro_closure_001_t {
+				x: i32,
+				y: i32,
+			}
+			#[implemented_by(foo_macro_closure_001)]
+			impl PrimitiveMacro for foo_macro_closure_001_t {}
+			let my_macro = foo_macro_closure_001_t { x, y };
+			my_macro
+		}
+		fn bar() {
+			let my_macro = foo();
+			let foo_macro_closure_001_t { ref __x, ref __y } = my_macro;
+			foo_macro_closure_001!(__x __y foobar +-+ 3*3);
+		}
+		```
+	*	Notably, we need `move` like for closures. We need to explicitly specify which variables are captured and whether directly, by `ref`, or be `ref mut`.
+	*	In expression position the `let ..._clocure_..._t { ... } = ...` part is in a new block.
+	*	We might _actually_ want those `__x` and `__y` to be more like temporaries and live until the end of the expression.
+	*	Macro closures either implement `PrimitiveMacroOnce` and `MacroOnce` directly, or (when they are callable multiple times)
+		they implement `Macro` or `MacroMut` and have a (hidden) extra newtype around a
+		a reference or mut ref to themselves implement `PrimitiveMacroOnce`.
+		TODO: Think about optimizations around small types (smaller than references) that are `Copy` in this context, too.
+	*	This feature gives us:
+		*	Better import/export of macros, referencing of other macros, even private ones (just include them into the closure, it’s still going to stay
+			zero-sized when it has zero-sized fields... well, at least if we’re smart about including zero-sized `Copy` types (or in general
+			smaller-than-or-equal-to-pointer-sized	`Copy` types by value instead of by shared static reference.. actually, also every compile-time-known static reference
+			could be replaced by a zero-sized type anyways))
+		*	Macros in method position: just do things like `object.macro_method()!(special ## syntax +-+ whatever)`
+		*	We might want to think about a way to write this like `object.macro_method!(special ## syntax +-+ whatever)`
+		*	Features like named arguments as macros.
