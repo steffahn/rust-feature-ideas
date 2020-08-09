@@ -295,3 +295,6 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		*	Macros in method position: just do things like `object.macro_method()!(special ## syntax +-+ whatever)`
 		*	We might want to think about a way to write this like `object.macro_method!(special ## syntax +-+ whatever)`
 		*	Features like named arguments as macros.
+
+*	Here’s an easy one: Make `std::mem::needs_drop::<T>()` return `false` even if `T` implements `Drop` as long as the `drop` implementation does not do anything.
+	In particular, this should be made to work if the code in `fn drop` impl is wrapped in an `if` with a `const` evaluable condition.
