@@ -38,4 +38,4 @@ Addressing this point from [brainstorming.md](brainstorming.md)
 *	Whenever at some point both <code>_TypeExpr_: Inhabited</code> and <code>_TypeExpr_: !Inhabited</code> holds, it is known that that point is unreachable.
 	In particular, in unreachable code an end of a block has an implicit return value of `!` instead of `()`.
 *	The compiler has an internal, more precise notion of inhabited vs uninhabited types. Basically, this notion operates as if every legal `Contains`
-	implementation would actually exist. This internal reasoning can be used to remove uninhabited variants from enums.
+	implementation would actually exist and all fields are public. This internal reasoning can be used to remove uninhabited variants from enums.
