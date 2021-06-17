@@ -9,12 +9,8 @@ fn f() {
     
     }
     
-    let Some(x) = foo.next(); else {
+    let Some(x) = foo.next(), else {
         return;
-    }
-    if x < y;
-    else {
-        
     }
     
     if y <= x, {
@@ -34,5 +30,63 @@ fn f() {
     if let Some(x) = bar() {
         
     }
+
+    if !(foo() && bar()) {
+
+    }
+
+    if !foo() || !bar() {
+
+    }
+
+    foo() && bar(), else {
+
+    }
+
+    foo(), and bar(), else {
+
+    }
+
+    foo(),
+    and bar(),
+    else {
+
+    }
+
+    let Some(x) = foo(v),
+    and bar(x) < z,
+    else if v.abc() {
+        // diverge
+    } else {
+        // diverge
+    }
+
+    if let Some(x) = a + b, and x > 42 {
+
+    }
+
+    if let Some(x) = a + b,
+    and x > 42,
+    and let Ok(foo) = x.try_add(100.pow(42)),
+    {
+
+    }
+
+    if FooB {
+        x: 42,
+        y: 24,
+    }.try_build().is_some(),
+    {
+	// …
+    }
+
+    // subtle around commas though
+    let x: () = if foo {} else { /* diverge */ };
+
+    let x: () = if foo {},
+    else {
+	/* diverge */
+    }
+    ;
 }
 ```
