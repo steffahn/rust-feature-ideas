@@ -38,6 +38,9 @@ fn f() {
     if !foo() || !bar() {
 
     }
+    
+    // but the ones below clearly indicate that the function (or loop of try block) will be exited
+    // if the condition fails
 
     foo() && bar(), else {
 
