@@ -31,30 +31,34 @@ fn f() {
         
     }
 
-    if !(foo() && bar()) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    if !(foo() && bar()) {
+        panic!()
     }
 
     if !foo() || !bar() {
-
+        panic!()
     }
-    
+
     // but the ones below clearly indicate that the function (or loop of try block) will be exited
     // if the condition fails
 
     foo() && bar(), else {
-
+        panic!()
     }
 
     foo(), and bar(), else {
-
+        panic!()
     }
 
     foo(),
     and bar(),
     else {
-
+        panic!()
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let Some(x) = foo(v),
     and bar(x) < z,
