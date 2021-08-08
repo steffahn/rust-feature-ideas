@@ -54,6 +54,10 @@ Thoughts:
 *   Another use case is “deferred” execution at the end of scope through descturctors. `&nba` borrows that only materialize for the destructor call would be
     needed. This assumes some way of annotating upgrading-requirements for destructors.
 
+<hr>
+
+TODO: create a list of use-case in the form of concrete code examples (using stand-in syntax).
+
 [std]: https://doc.rust-lang.org/std/index.html
 [cell]: https://doc.rust-lang.org/std/cell/index.html
 [RefCell]: https://doc.rust-lang.org/std/cell/struct.RefCell.html
