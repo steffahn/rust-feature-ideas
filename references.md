@@ -43,7 +43,8 @@ Thoughts:
             *   The example of <code>[RefCell]::[get_mut]</code> could support up-/downgrading between [`&mut`] and `&nba`, just no intermediate [`&`]-state.
                 *   Actually, <code>[RefCell]::[get_mut]</code> can also support working with `&nba`-level access for the duration of the function call itself,
                     i.e. two-staged-borrow-esque interaction.
-            *   Is there any existing API that would become unsound with an [`&`]-state-less up-/downgrade?
+            *   <strike>Is there any existing API that would become unsound with an [`&`]-state-less up-/downgrade?</strike>
+                Yes! <code>[std]::[str][str_mod]::[from_utf8_mut]</code>
     *   Maybe syntax suggesting “lazy” borrowing for supporting the not-borrowed-at-all state during the call? My Haskell mind says using `~`, so
         something like `~&T` and `~&mut T` and `~&[mut] T`? Or `&~T` and `&mut ~T` and `&[mut] ~T`? Or `&~T` and `&~mut T` and `&~[mut] T`?
         Where does the lifetime go for the last ones?
@@ -66,3 +67,5 @@ Thoughts:
 [`&`]: https://doc.rust-lang.org/std/primitive.reference.html
 [`mut`]: https://doc.rust-lang.org/std/keyword.mut.html
 [compare `brainstorming.md`]: ./brainstorming.md#:~:text=Mutability%20generics
+[str_mod]: https://doc.rust-lang.org/std/str/index.html
+[from_utf8_mut]: https://doc.rust-lang.org/std/str/fn.from_utf8_mut.html
