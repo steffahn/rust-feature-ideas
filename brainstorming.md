@@ -21,7 +21,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 
 	*	Hence some (or most) drop flags would become unnecessary; furthermore some moves can be eliminated,
 		(suppose, `String` implements `DropEarly`) for example:
-		```rust
+		```rs
 		fn main() {
 			let a = String::from("foo");
 			if EXPR {
@@ -35,7 +35,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		}
 		```
 		currently becomes something like
-		```rust
+		```rs
 		fn main() {
 			let a = String::from("foo");
 			let a_dropped = false;
@@ -52,7 +52,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		}
 		```
 		But it could instead become:
-		```rust
+		```rs
 		fn main() {
 			let a = String::from("foo");
 			if EXPR {
@@ -86,7 +86,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	*	The exact (or perhaps earliest possible) point of drop is the end of the smalles possible lifetime of the variable.
 
 	*	There should be `impl`s such as for example:
-		```rust
+		```rs
 		impl<T: ?Sized + DropEarly> DropEarly for Box<T> {}
 		impl<T: ?Sized + DropEarly> DropEarly for Vec<T> {}
 		```
@@ -242,7 +242,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 	*	every _ordinary_ macro is a zero_sized type that implemets `Macro` and `PrimitiveMacroOnce` and `Copy`.
 	*	`Macro` has an associated type `MacroType: PrimitiveMacro`, and we have `trait PrimitiveMacroOnce: MacroOnce<MacroType = Self>`.
 	*	There is a way to create _macro closures_.
-		```rust
+		```rs
 		// TODO: make this fit with the changed PrimitiveMacroOnce
 		fn foo() -> impl PrimitiveMacro {
 			let x = 1;
@@ -258,7 +258,7 @@ Quick and unfinished ideas, most of them just me brainstorming :-D
 		}
 		```
 		which could, roughly, be thought of like
-		```rust
+		```rs
 		macro_rules! foo_macro_closure_001 {
 			($x:ident $y:ident foobar +-+ $e:expr) => {println!("{}", (*$x) + (*$y) + $e};
 		}
