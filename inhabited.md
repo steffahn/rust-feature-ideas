@@ -18,7 +18,7 @@ Addressing this point from [brainstorming.md](brainstorming.md)
 	at that later point. Similarly if the value is not in scope has already been bound to a temporary in the current or previous statements, or if it _could_ have
 	been bound but was discarded, for example by a `_` in a pattern.
 	*	This last point aims to allow code like
-		```rust
+		```rs
 		let x: Result<i32, !> = Ok(42);
 		match x {
 			Ok(y) => y,
@@ -27,7 +27,7 @@ Addressing this point from [brainstorming.md](brainstorming.md)
 		```
 		The rule could be extended so that `_ => {}` works, too, and ultimately such that the whole branch is allowed to be omitted.
 *	For a data type with constraints, like e.g.
-	```rust
+	```rs
 	struct HasEqConstraint<T: Eq>(PhantomData<*const T>);
 	```
 	using the constructor `HasEqConstraint` requires `T: Eq` to be known. The same applies to unsized coercions, e.g. from `Box<HasEqConstraint<Struct>>`
