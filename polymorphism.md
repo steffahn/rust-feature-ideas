@@ -12,7 +12,7 @@
 
 *	In a `fn foo<poly T>(…) -> … { … }` function, `T` can only be used in limited ways!
 	*	as parameter for other functions with `poly T` type argument
-	*	lifetime bounds `T: 'a` are okay, most trait bounds are not allowed (more details below)
+	*	lifetime bounds `T: 'a` are okay, most trait bounds are not allowed (more details below _TODO, STILL MISSING_)
 	*	as parameters for _types_ with a `poly T` type argument
 		*	standard library types with `poly T` type argument:
 			*	`&'a T`
