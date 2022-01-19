@@ -62,6 +62,17 @@ Overview of how fine-grained monomorphization is for each case
 <table>
 <tr>
 <th>
+<th colspan=2>
+
+“polymorphic type argument”
+<th>
+
+type argument supporting non-“concrete” types… perhaps: “uniform type argument”
+<th>
+
+“concrete type argument”
+<tr>
+<th>
 <th>
 
 `<poly T>`
@@ -80,10 +91,10 @@ Overview of how fine-grained monomorphization is for each case
 Mo&shy;no&shy;mor&shy;phi&shy;za&shy;tion
 <td>
 
-No monomorphization at all, a single implementation at run time.
+No mo&shy;no&shy;mor&shy;phi&shy;za&shy;tion at all, a single imple&shy;men&shy;tation at run time.
 <td>
 
-One monomorphized instance per unsized-metadata-layout. E.g. if `usize` and vtable-pointers have the same layout, there’ll be
+One mono&shy;mor&shy;phized instance per unsized-metadata-layout. E.g. if `usize` and vtable-pointers have the same layout, there’ll be
 exactly two instantiations, otherwise three (one for metadata-free, one for slice-based, and one for trait-object-based
 unsized types).
 <td>
@@ -92,7 +103,7 @@ One monomorphized instance for each type `Layout` + drop glue combination. (Addi
 Not 100% clear what’s guaranteed to be known not to make a difference, besides the fact that `poly T` type arguments do types don’t make a difference. (And lifetimes, too, obviously, but that applies to all functions.)
 <td>
 
-For each concrete type (except lifetimes).
+For each concrete type (i.e. only ignoring lifetime differences).
 <tr>
 <th>
 
