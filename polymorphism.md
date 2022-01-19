@@ -100,7 +100,8 @@ unsized types).
 <td>
 
 One monomorphized instance for each type `Layout` + drop glue combination. (Additionally, also differentiates pointer metadata layout differences.)
-Not 100% clear what’s guaranteed to be known not to make a difference, besides the fact that `poly T` type arguments do types don’t make a difference. (And lifetimes, too, obviously, but that applies to all functions.)
+Not 100% clear what’s guaranteed to be known not to make a difference, besides the fact that `poly T` type arguments do types don’t make a difference.
+(And lifetimes, too, obviously, but that applies to all functions.)
 <td>
 
 For each concrete type (i.e. only ignoring lifetime differences).
