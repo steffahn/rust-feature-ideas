@@ -59,9 +59,61 @@
 
 Overview of how fine-grained monomorphization is for each case
 
-_TODO: THERE’LL BE A TABLE_
+<table>
+<tr>
+<th>
+<th>
+
+`<poly T>`
+<th>
+
+`<poly T: ?Sized>`
+<th>
+
+`<T: ?Concrete>` / `<T: ?Concrete + ?Sized>`
+<th>
+
+`<T>` / `<T: ?Sized>`
+<tr>
+<th>
+
+Mo&shy;no&shy;mor&shy;phi&shy;za&shy;tion
+<td>
+
+No monomorphization at all, a single implementation at run time.
+<td>
+
+One monomorphized instance per unsized-metadata-layout. E.g. if `usize` and vtable-pointers have the same layout, there’ll be
+exactly two instantiations, otherwise three (one for metadata-free, one for slice-based, and one for trait-object-based
+unsized types).
+<td>
+
+One monomorphized instance for each type `Layout` + drop glue combination. (Additionally, also differentiates pointer metadata layout differences.)
+Not 100% clear what’s guaranteed to be known not to make a difference, besides the fact that `poly T` type arguments do types don’t make a difference. (And lifetimes, too, obviously, but that applies to all functions.)
+<td>
+
+For each concrete type (except lifetimes).
+<tr>
+<th>
+
+Additional Remarks
+<td colspan=2><td>
+
+For a `#[repr(transparent)]` type without additional `Drop` implementation, there could be a guarantee that the layout _and_ drop implementations match, i.e.
+no further monomorphization for `T: ?Concrete` type arguments. (I’m not sure I know any good use cases for such a guarantee though.)
+
+For guaranteed-drop-glue-free types, e.g. at least `Copy` types, only `Layout` is important; this, too, could be guaranteed.
+
+By “guaranteed match of layout / no further monomorphization”, I mean – in terms of language semantics – that you won’t get any errors about the compiler
+recursively trying to instantiate an infinititude of monomorphized instances of your code.
+
+Trait objects all have the same layout and drop implementation.
+<td>
+</table>
 
 <hr>
+
+Some most basic polymorphic recursion example. (_TODO: add explanations_)
 
 ```rs
 use std::{
