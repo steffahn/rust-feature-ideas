@@ -142,8 +142,10 @@ impl<T: ?Concrete> PolyBox<T> {
     fn new(x: T) -> Self {
         let meta: &Metadata<T> = StaticMetadata::META;
         let ptr = unsafe { NonNull::new_unchecked(alloc(meta.layout)) };
+        let ptr: NonNull<T> = ptr.cast();
+        unsafe { ptr.as_ptr().write(x) };
         Self {
-            ptr: ptr.cast(),
+            ptr,
             metadata: NonNull::from(meta),
         }
     }
