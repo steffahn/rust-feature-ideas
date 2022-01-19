@@ -60,3 +60,85 @@
 Overview of how fine-grained monomorphization is for each case
 
 _TODO: THERE’LL BE A TABLE_
+
+<hr>
+
+```rs
+use std::{
+    alloc::{alloc, dealloc, Layout},
+    ptr::{self, NonNull},
+};
+
+struct PolyBox<poly T> {
+    ptr: NonNull<T>,
+    metadata: NonNull<Metadata<T>>,
+}
+
+impl<T: ?Concrete> PolyBox<T> {
+    fn new(x: T) -> Self {
+        let meta: &Metadata<T> = StaticMetadata::META;
+        let ptr = unsafe { NonNull::new_unchecked(alloc(meta.layout)) };
+        Self {
+            ptr: ptr.cast(),
+            metadata: NonNull::from(meta),
+        }
+    }
+}
+
+impl<poly T> Drop for PolyBox<T> {
+    fn drop(&mut self) {
+        let meta: &Metadata<T> = unsafe { self.metadata.as_ref() };
+        struct DeallocOnDrop(*mut u8, Layout);
+        let _guard = DeallocOnDrop(self.ptr.as_ptr().cast(), meta.layout);
+        unsafe { (meta.drop_in_place)(self.ptr.as_mut()) };
+        impl Drop for DeallocOnDrop {
+            fn drop(&mut self) {
+                unsafe { dealloc(self.0, self.1) };
+            }
+        }
+    }
+}
+
+struct Metadata<poly T> {
+    layout: Layout,
+    drop_in_place: unsafe fn(*mut T),
+}
+impl<T: ?Concrete> Metadata<T> {
+    const fn new() -> Self {
+        Self {
+            layout: Layout::new::<T>(),
+            drop_in_place: ptr::drop_in_place::<T>,
+        }
+    }
+}
+
+trait StaticMetadata<'a>: ?Concrete + Sized + 'a {
+    const META: &'a Metadata<Self>;
+}
+
+impl<'a, T: ?Concrete + 'a> StaticMetadata<'a> for T {
+    const META: &'a Metadata<Self> = &Metadata::new();
+}
+
+struct Tree<poly T>(Count<T>);
+
+enum Count<poly T> {
+    Once(PolyBox<T>),
+    Twice(Box<Count<[PolyBox<T>; 2]>>),
+}
+use Count::*;
+
+impl<poly T> Tree<T> {
+    // link 2 trees of equal size
+    fn link(self, other: Tree<T>) -> Option<Tree<T>> {
+        fn recurse<poly T>(left: Count<T>, right: Count<T>) -> Option<Count<T>> {
+            Some(match (left, right) {
+                (Once(l), Once(r)) => Twice(Box::new(Once(PolyBox::new([l, r])))),
+                (Twice(l), Twice(r)) => Twice(Box::new(recurse(*l, *r)?)),
+                _ => None?,
+            })
+        }
+        Some(Tree(recurse(self.0, other.0)?))
+    }
+}
+```
