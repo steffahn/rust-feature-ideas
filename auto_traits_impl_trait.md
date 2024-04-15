@@ -55,6 +55,54 @@ All of this is very verbose however.
 
 ### A leaner alternative, inspired by `PhantomData`
 
+Auto traits are notable for that we usually do *not* write their implementations manually.
+Another personal idea&opinion of mine is that this might even be a good idea to consider in cases where currently they *are* explicit.
+
+E.g. if I were to implement my own personal … let’s see … iterator over `&mut [T]`, then the type contains raw pointers
+```rs
+struct IterMut<'a, T> {
+    current: *mut T,
+    end: *mut T,
+    marker: PhantomData<&'a mut T>, // marker mostly for using the lifetime
+}
+```
+and then, on top of that, I need to write `Send` and `Sync` implementations
+```rs
+unsafe impl<T: Sync> Sync for IterMut<'_, T> {}
+unsafe impl<T: Send> Send for IterMut<'_, T> {}
+```
+making sure to mirror the right implementation pattern from `&mut T` (or equivalently `&mut [T]`).
+
+But why the effort? I could just use `PhantomData` to make this “follow the impls of `&mut T`” idea explicit!
+Well, almost; `*mut T: !Send + !Sync` kills this idea… [if only there was a general opt-out for those conservative implementations](https://github.com/rust-lang/libs-team/issues/322):[^1]
+```rs
+struct IterMut<'a, T> {
+    current: AssertThreadSafe<*mut T>,
+    end: AssertThreadSafe<*mut T>,
+    marker: PhantomData<&'a mut T>, // marker now used for correct Send+Sync, too
+}
+```
+
+Returning from this detour, let’s now just declare auto traits by-example ✨
+```rs
+trait Foo {
+    fn bar<T>(arg: T) -> impl Baz + auto<&Self, T>;
+}
+```
+
+The syntax `impl Trait + auto<T₁, …, Tₙ>` takes an arbitrary number of parameters, and the `impl Trait` type then implements all auto traits exactly if (and only if) the types `T₁`, …, `Tₙ` do. Imagine some
+```rs
+impl<…> Sync for impl_trait_type
+where
+    T₁: Sync,
+     …
+    Tₙ: Sync,
+{}
+```
+and so on, for all the auto traits.
+
+[^1]: No more `unsafe` in this code example!? That’s unsound – or is it? No, not really, since doing anything that might break thread safety would need to dereference those pointers `current` and/or `end` and ***that’s*** still `unsafe`. 
+
 WIP
 
 ### Lifetime captures in the same manner
