@@ -158,9 +158,15 @@ Another interesting question would be whether you can decide *not* to capture an
 
 If `auto<…>` is not specified explicitly, existing behavior continues, as outlined above already. This can also be expressed in a sort-of desugaring of elided `auto<…>` bounds.
 
-For normal functions or methods (i.e. not in trait definitions) the “desugared” version if the signature is simply `+ auto<ActualReturnType>`. Is is not an entirely faithful desugaring since 
+For normal functions or methods (i.e. not in trait definitions) the “desugared” version of the signature is simply `+ auto<ActualReturnType>`. It is not an entirely truly a desugaring since 
+many use cases of `-> impl Trait` return types involve anonymous types. For methods in trait definitions (not trait implementations though), the desugared version is something like `+ auto<Marker>`
+for some marker type that doesn't implement any (relevant) autotraits; i.e. similar to `auto<*const (), PhantomPinned>` with “marker” types today,
+or `<PhantomNotSendSync, PhantomPinned>` if we get a more dedicated marker type here for `!Send + !Sync`.
 
-WIP (elided “defaults”; negative reasoning and frozen model impls)
+There is one issue here. Say something declares `auto<*const ()>` and then returns something that captures `*mut i32` or `Cell<bool>`. All of these are `!Sync`. But *really* what the compiler wants to
+ensure here is that the return type such as `Cell<bool>` fulfills `Cell<bool>: Sync` if `*const (): Sync`. Which isn’t really the case today, arguably. TODO…
+
+WIP (negative reasoning and frozen model impls)
 
 ### `async fn`
 
